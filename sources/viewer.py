@@ -61,15 +61,13 @@ class Viewer(Process):
                 for k, v in q.items():
                     if k == TERMINATE:
                         mainloop=False
-            ###escape
+            # close
             for event in pygame.event.get() :
                 if event.type == pygame.QUIT :
                     mainloop = False
-                elif event.type == pygame.KEYDOWN :
-                    # if event.key == pygame.K_ESCAPE :
-                    #     mainloop = False 
             ######################################
             # Keyboard events
+                elif event.type == pygame.KEYDOWN :
                     if event.key == pygame.K_z:
                         self._event_queue.put({K_Z:None})
                     elif event.key == pygame.K_RETURN:
@@ -117,4 +115,8 @@ class Cursor(pygame.sprite.DirtySprite):
     
     def update(self):
         self.rect.center = pygame.mouse.get_pos()
+        self.dirty = 1
+
+    def change_color(self, color):
+        self.image.fill(color)
         self.dirty = 1
