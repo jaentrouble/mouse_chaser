@@ -72,6 +72,10 @@ class Viewer(Process):
                         self._event_queue.put({K_Z:None})
                     elif event.key == pygame.K_RETURN:
                         self._event_queue.put({K_ENTER:None})
+                    elif event.key == pygame.K_1:
+                        self._event_queue.put({K_1:None})
+                    elif event.key == pygame.K_2:
+                        self._event_queue.put({K_2:None})
             # Mouse events
                 elif event.type == pygame.MOUSEBUTTONDOWN:
                     if pygame.mouse.get_pressed()[0]:

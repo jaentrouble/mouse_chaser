@@ -19,13 +19,18 @@ class Engine(Process):
         super().__init__(daemon=True)
         # Initial dummy frame
         self._frames = [np.zeros((300,300,3),dtype=np.uint8)]
-        self.frame_idx = 0
         # Queues
         self._to_EngineQ = to_EngineQ
         self._to_ConsoleQ = to_ConsoleQ
         self._imageQ = imageQ
         self._eventQ = eventQ
         self._etcQ = etcQ
+
+        self._updated = False
+
+    @property
+    def frame_num(self):
+        return len(self._frames)
 
     @property
     def image(self):
@@ -43,7 +48,6 @@ class Engine(Process):
             raise TypeError('Inappropriate shape of image')
         self._image = image.astype(np.uint8)
         self._shape = self._image.shape
-        self.set_empty_mask()
         self._updated = True
 
     @property
@@ -59,11 +63,20 @@ class Engine(Process):
         """Index of current frame"""
         return self._frame_idx
 
-    @property
+    @frame_idx.setter
     def frame_idx(self, idx:int):
         """Sets current image to the idx"""
         self._frame_idx = idx
         self.image=self._frames[idx]
+        self._to_ConsoleQ.put(
+            {FRAMEIDX:f'{self._frame_idx}/{self.frame_num-1}'}
+        )
+
+    def next_frame(self):
+        self.frame_idx = (self.frame_idx+1) % self.frame_num
+
+    def prev_frame(self):
+        self.frame_idx = (self.frame_idx-1) % self.frame_num
 
     def load_vid(self, vid_name):
         """Load a video and returns total frame number
@@ -74,17 +87,34 @@ class Engine(Process):
 
         Return
         ------
-        num_frames : int
+        frame_num : int
             Total number of frames
         """
+        print('loading...')
+        self._vid_name = vid_name
         cap = cv2.VideoCapture(vid_name)
         self._frames = []
-        while(cap.isOpened):
+        n = 0
+        while(cap.isOpened()):
             ret, frame = cap.read()
-            self._frames.append(frame)
+            if ret:
+                self._frames.append(frame.swapaxes(0,1))
+                if n % 500 == 0:
+                    self._to_ConsoleQ.put(
+                        {FRAMEIDX:f'loading : {n}frames loaded'}
+                    )
+                n += 1
+            else :
+                break
         cap.release()
-        return len(self._frames)
+        self.frame_idx = 0
+        print(f'{self.frame_num}frames loaded')
+        print(f'shape : {self.shape}')
+        return self.frame_num
 
+
+    def put_image(self):
+        self._imageQ.put(self.image)
 
     def run(self):
         mainloop = True
@@ -96,6 +126,9 @@ class Engine(Process):
                 for k, v in q.items():
                     if k == TERMINATE:
                         mainloop = False
+
+                    elif k == NEWVID:
+                        self.load_vid(v)
 
             if not self._eventQ.empty():
                 q = self._eventQ.get()
@@ -111,12 +144,14 @@ class Engine(Process):
                     # Keyboard events
                     elif k == K_Z:
                         pass
-                    elif k == K_B:
-                        pass
                     elif k == K_ENTER:
                         pass
-                    elif k == K_ESCAPE:
-                        pass
+
+                    # Prev / Next frame
+                    elif k == K_1:
+                        self.prev_frame()
+                    elif k == K_2:
+                        self.next_frame()
 
 
             if self._updated:
