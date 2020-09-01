@@ -25,7 +25,13 @@ class Console(Process):
 
         self._info_str = (
             '1 : prev frame\n'
-            '2 : next frame'
+            '2 : next frame\n'
+            'F : pin food\n'
+            'E : pin ear\n'
+            'R : pin nose\n'
+            'D : pin tail\n'
+            'I : increase food pin\n'
+            'L : decrease food pin\n'
         )
 
     def initiate(self):
@@ -38,6 +44,7 @@ class Console(Process):
         self.root.resizable(False, False)
         self._vid_name_var = tk.StringVar(value='No video loaded')
         self._frame_idx_var = tk.StringVar(value='No video loaded')
+        self._marker_idx_var = tk.StringVar(value='No video loaded')
         self._info_var = tk.StringVar(value=self._info_str)
 
         # # Configure Top-left threshold setting menu ###########################
@@ -46,6 +53,9 @@ class Console(Process):
         self.label_frame_idx = ttk.Label(self.frame_frame,
                                         textvariable=self._frame_idx_var)
         self.label_frame_idx.grid(column=0, row=0, sticky=(tk.W))
+        self.label_marked_idx = ttk.Label(self.frame_frame,
+                                         textvariable=self._marker_idx_var)
+        self.label_marked_idx.grid(column=0, row=1, sticky=(tk.W))
 
         # Configure Top-Right Prev/Next menu ##################################
         self.frame_prevnext = ttk.Frame(self.root, padding='5 5 5 5')
@@ -156,4 +166,6 @@ class Console(Process):
             for k,v in q.items():
                 if k == FRAMEIDX:
                     self._frame_idx_var.set(v)
+                if k == MARKERIDX:
+                    self._marker_idx_var.set(v)
         self.root.after(16, self.update)

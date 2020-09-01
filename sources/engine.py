@@ -5,13 +5,22 @@ import os
 import json
 from pathlib import Path
 import cv2
+import copy
 
 # To limit loop rate
 from pygame.time import Clock
 
 class Engine(Process):
-    """
-    Main process that calculates all the necessary computations
+    """Main process that calculates all the necessary computations
+
+    Data structure
+    [
+        {
+            'image' : np.array of the frame
+            'marker name' : pos,
+        },
+    ]
+    Data will be in order of the actual frame order
     """
     # If the image is not updated, check if self._updated is switched to True
     def __init__(self, to_EngineQ:Queue, to_ConsoleQ:Queue,
@@ -27,6 +36,19 @@ class Engine(Process):
         self._etcQ = etcQ
 
         self._updated = False
+
+        self._data = []
+        self._dummy_datum = {
+            'image' : np.zeros((300,300,3),dtype=np.uint8),
+            'nose' : (0,0),
+            'ear' : [(0,0),(0,0)],
+            'tail' : (0,0),
+            'food' : [(0,0),(0,0)],
+        }
+        self._multiple_marker_idx = {
+            'ear' : 0,
+            'food' : 0,
+        }
 
     @property
     def frame_num(self):
@@ -71,12 +93,18 @@ class Engine(Process):
         self._to_ConsoleQ.put(
             {FRAMEIDX:f'{self._frame_idx}/{self.frame_num-1}'}
         )
+        self.reset_multi_marker_idx()
 
     def next_frame(self):
-        self.frame_idx = (self.frame_idx+1) % self.frame_num
+        last_idx = self.frame_idx
+        self.frame_idx = min(self.frame_idx+1,self.frame_num)
+        if self.frame_idx+1 > len(self._data):
+            new_datum = copy.deepcopy(self._data[last_idx])
+            new_datum['image'] = self.image
+            self._data.append(new_datum)
 
     def prev_frame(self):
-        self.frame_idx = (self.frame_idx-1) % self.frame_num
+        self.frame_idx = max(self.frame_idx-1,0)
 
     def load_vid(self, vid_name):
         """Load a video and returns total frame number
@@ -98,6 +126,7 @@ class Engine(Process):
         while(cap.isOpened()):
             ret, frame = cap.read()
             if ret:
+                frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
                 self._frames.append(frame.swapaxes(0,1))
                 if n % 500 == 0:
                     self._to_ConsoleQ.put(
@@ -107,14 +136,58 @@ class Engine(Process):
             else :
                 break
         cap.release()
+
         self.frame_idx = 0
+        self._data = []
+        new_data = copy.deepcopy(self._dummy_datum)
+        new_data['image'] = self.image
+        self._data.append(new_data)
+
         print(f'{self.frame_num}frames loaded')
         print(f'shape : {self.shape}')
         return self.frame_num
 
+    def reset_multi_marker_idx(self):
+        """Resets all multiple_markers' indices to 0"""
+        for k in self._multiple_marker_idx.keys():
+            self._multiple_marker_idx[k] = 0
 
-    def put_image(self):
-        self._imageQ.put(self.image)
+    def update_marker_pos(self, marker_type, pos):
+        """Update marker's position
+        If the marker type has multiple markers, it iterates
+        
+        Parameters
+        ----------
+        marker_type : str
+            Type of the marker. Available options are:
+                'nose'
+                'ear'
+                'food'
+                'tail'
+        pos : tuple
+            Position of the marker
+        """
+        datum = self._data[self.frame_idx]
+        single_markers = [
+            'nose',
+            'tail',
+        ]
+        multiple_markers = [
+            'ear',
+            'food',
+        ]
+        if marker_type in single_markers:
+            datum[marker_type] = pos
+        elif marker_type in multiple_markers:
+            idx = self._multiple_marker_idx[marker_type] % len(datum[marker_type])
+            self._multiple_marker_idx[marker_type] = idx
+            datum[marker_type][idx] = pos
+            self._multiple_marker_idx[marker_type] += 1
+
+        self._updated = True
+
+    def put_datum(self):
+        self._imageQ.put(self._data[self.frame_idx])
 
     def run(self):
         mainloop = True
@@ -147,6 +220,16 @@ class Engine(Process):
                     elif k == K_ENTER:
                         pass
 
+                    # Markers
+                    elif k == K_F:
+                        self.update_marker_pos('food',v)
+                    elif k == K_E:
+                        self.update_marker_pos('ear',v)
+                    elif k == K_R:
+                        self.update_marker_pos('nose',v)
+                    elif k == K_D:
+                        self.update_marker_pos('tail',v)
+
                     # Prev / Next frame
                     elif k == K_1:
                         self.prev_frame()
@@ -155,5 +238,8 @@ class Engine(Process):
 
 
             if self._updated:
-                self.put_image()
+                self.put_datum()
+                self._to_ConsoleQ.put(
+                    {MARKERIDX:f'Marked until {len(self._data)-1} (idx)'}
+                )
                 self._updated = False
