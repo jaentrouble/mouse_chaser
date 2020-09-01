@@ -2,10 +2,10 @@ import numpy as np
 from multiprocessing import Process, Queue
 from .common.constants import *
 import os
-import json
 from pathlib import Path
 import cv2
 import copy
+import pickle
 
 # To limit loop rate
 from pygame.time import Clock
@@ -137,6 +137,7 @@ class Engine(Process):
                 break
         cap.release()
 
+        # Reset data
         self.frame_idx = 0
         self._data = []
         new_data = copy.deepcopy(self._dummy_datum)
@@ -186,8 +187,36 @@ class Engine(Process):
 
         self._updated = True
 
+    def add_food_marker(self, pos):
+        self._data[self.frame_idx]['food'].append(pos)
+        self._updated = True
+
+    def pop_food_marker(self):
+        if len(self._data[self.frame_idx]['food']) >0:
+            self._data[self.frame_idx]['food'].pop()
+            self._updated = True
+
     def put_datum(self):
         self._imageQ.put(self._data[self.frame_idx])
+
+    def save_data(self, vid_folder):
+        """Saves to <vid_folder> / save / <n>.pck
+        As every data has its image, there is no need to specify video name.
+        """
+        vid_folder = Path(vid_folder)
+        save_folder = vid_folder / 'save'
+        if not save_folder.exists():
+            save_folder.mkdir()
+        
+        start_num = len(os.listdir(str(save_folder)))
+        data_name = str(start_num) + '.pck'
+
+        filename_data = save_folder/data_name
+        
+        with open(str(filename_data), 'wb') as f:
+            pickle.dump(self._data, f)
+        
+        self._to_ConsoleQ.put({MESSAGE_BOX:'saved'})
 
     def run(self):
         mainloop = True
@@ -202,6 +231,9 @@ class Engine(Process):
 
                     elif k == NEWVID:
                         self.load_vid(v)
+
+                    elif k == SAVE:
+                        self.save_data(v)
 
             if not self._eventQ.empty():
                 q = self._eventQ.get()
@@ -229,6 +261,10 @@ class Engine(Process):
                         self.update_marker_pos('nose',v)
                     elif k == K_D:
                         self.update_marker_pos('tail',v)
+                    elif k == K_I:
+                        self.add_food_marker(v)
+                    elif k == K_L:
+                        self.pop_food_marker()
 
                     # Prev / Next frame
                     elif k == K_1:

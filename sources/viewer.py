@@ -132,16 +132,18 @@ class Viewer(Process):
         """
         self._width, self._height = size
 
-    def _add_food_marker(self, pos=(0,0)):
+    def _add_food_marker(self, group, pos=(0,0)):
         """Add one food marker
         Argument
         --------
+        group : pygame group
+            Group to add the marker
         pos : tuple
             Position of the marker. Default is (0,0)
         """
-        self._marker_foods.append(
-            Marker(self._icon_dir/'food.png',pos)
-        )
+        new_marker = Marker(self._icon_dir/'food.png',pos)
+        new_marker.add(group)
+        self._marker_foods.append(new_marker)
 
     def _initiate_markers(self, group):
         """Initiate all markers
@@ -210,7 +212,8 @@ class Viewer(Process):
             self._marker_tail.change_pos(pos)
         
         elif 'food' in marker_type:
-            assert isinstance(pos[0],(tuple,list))
+            if len(pos)>0:
+                assert isinstance(pos[0],(tuple,list))
             num_diff = len(self._marker_foods) - len(pos)
             if num_diff == 0:
                 for m,p in zip(self._marker_foods, pos):
@@ -226,7 +229,7 @@ class Viewer(Process):
                 for m, p in zip(self._marker_foods, pos[:num_diff]):
                     m.change_pos(p)
                 for p in pos[num_diff:]:
-                    self._add_food_marker(p)
+                    self._add_food_marker(self._allgroup,p)
     def close(self):
         pygame.quit()
 

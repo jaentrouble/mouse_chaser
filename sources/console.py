@@ -154,7 +154,7 @@ class Console(Process):
                 self._vid_name_var.set(self._vid_name_list[self._vid_idx])
 
     def button_save_f(self):
-        self._to_EngineQ.put({SAVE:None})
+        self._to_EngineQ.put({SAVE:self._vid_folder})
 
 
     def message_box(self, string):
@@ -166,6 +166,8 @@ class Console(Process):
             for k,v in q.items():
                 if k == FRAMEIDX:
                     self._frame_idx_var.set(v)
-                if k == MARKERIDX:
+                elif k == MARKERIDX:
                     self._marker_idx_var.set(v)
+                elif k == MESSAGE_BOX:
+                    self.message_box(v)
         self.root.after(16, self.update)
