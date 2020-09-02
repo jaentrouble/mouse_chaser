@@ -98,6 +98,9 @@ class Viewer(Process):
                         self._event_queue.put({K_D:pygame.mouse.get_pos()})
                     elif event.key == pygame.K_f:
                         self._event_queue.put({K_F:pygame.mouse.get_pos()})
+                    elif event.key == pygame.K_w:
+                        self._event_queue.put({K_W:pygame.mouse.get_pos()})
+
                     elif event.key == pygame.K_i:
                         self._event_queue.put({K_I:pygame.mouse.get_pos()})
                     elif event.key == pygame.K_l:
@@ -181,6 +184,9 @@ class Viewer(Process):
         for m in self._marker_foods:
             group.add(m)
 
+        self._marker_water = Marker(self._icon_dir/'water.png',pos)
+        group.add(self._marker_water)
+
     def update_marker_pos(self, marker_type, pos):
         """Update marker's position.
 
@@ -192,6 +198,7 @@ class Viewer(Process):
                 'ear'
                 'food'
                 'tail'
+                'water'
         pos : tuple or list of tuples
             - Tuple for single position
                 'nose'
@@ -203,14 +210,17 @@ class Viewer(Process):
         if 'nose' in marker_type:
             self._marker_nose.change_pos(pos)
 
+        elif 'tail' in marker_type:
+            self._marker_tail.change_pos(pos)
+
+        elif 'water' in marker_type:
+            self._marker_water.change_pos(pos)
+        
         elif 'ear' in marker_type:
             assert (len(pos) == 2) and isinstance(pos[0],(tuple,list))
             for m,p in zip(self._marker_ears, pos):
                 m.change_pos(p)
 
-        elif 'tail' in marker_type:
-            self._marker_tail.change_pos(pos)
-        
         elif 'food' in marker_type:
             if len(pos)>0:
                 assert isinstance(pos[0],(tuple,list))

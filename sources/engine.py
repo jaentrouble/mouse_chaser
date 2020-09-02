@@ -44,6 +44,7 @@ class Engine(Process):
             'ear' : [(0,0),(0,0)],
             'tail' : (0,0),
             'food' : [(0,0),(0,0)],
+            'water' : (0,0),
         }
         self._multiple_marker_idx = {
             'ear' : 0,
@@ -165,6 +166,7 @@ class Engine(Process):
                 'ear'
                 'food'
                 'tail'
+                'water'
         pos : tuple
             Position of the marker
         """
@@ -172,6 +174,7 @@ class Engine(Process):
         single_markers = [
             'nose',
             'tail',
+            'water',
         ]
         multiple_markers = [
             'ear',
@@ -261,6 +264,9 @@ class Engine(Process):
                         self.update_marker_pos('nose',v)
                     elif k == K_D:
                         self.update_marker_pos('tail',v)
+                    elif k == K_W:
+                        self.update_marker_pos('water',v)
+
                     elif k == K_I:
                         self.add_food_marker(v)
                     elif k == K_L:
