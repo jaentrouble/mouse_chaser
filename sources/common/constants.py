@@ -41,7 +41,7 @@ K_I = 1105
 K_L = 1108
 
 # Console Constants ###########################################################
-VIDEO_FORMATS = ('.h264')
+VIDEO_FORMATS = ('.h264','.mpg')
 
 MESSAGE_BOX = 601
 FRAMEIDX = 602

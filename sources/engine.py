@@ -17,7 +17,9 @@ class Engine(Process):
     [
         {
             'image' : np.array of the frame
+                Shape : (WIDTH, HEIGHT, 3) -> Pygame notation
             'marker name' : pos,
+                Order : (WIDTH, HEIGHT) -> Pygame notation
         },
     ]
     Data will be in order of the actual frame order
