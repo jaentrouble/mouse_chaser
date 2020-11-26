@@ -27,7 +27,7 @@ class Console(Process):
             '1 : prev frame\n'
             '2 : next frame\n'
             'F : pin food\n'
-            'E : pin ear\n'
+            'E : pin head\n'
             'R : pin nose\n'
             'D : pin tail\n'
             'I : increase food pin\n'

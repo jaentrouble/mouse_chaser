@@ -153,7 +153,8 @@ class Viewer(Process):
 
         Markers initiating here : 
             1 Nose marker
-            2 Ear markers
+            # 2 Ear markers - deleted
+            1 Head marker
             1 Tail marker
             2 Food markers
                 - Note: Food markers will be saved in a list, so that it can
@@ -167,12 +168,15 @@ class Viewer(Process):
         self._marker_nose = Marker(self._icon_dir/'nose.png',pos)
         group.add(self._marker_nose)
 
-        self._marker_ears = [
-            Marker(self._icon_dir/'ear.png',pos),
-            Marker(self._icon_dir/'ear.png',pos),
-        ]
-        for m in self._marker_ears:
-            group.add(m)
+        # self._marker_ears = [
+        #     Marker(self._icon_dir/'ear.png',pos),
+        #     Marker(self._icon_dir/'ear.png',pos),
+        # ]
+        # for m in self._marker_ears:
+        #     group.add(m)
+
+        self._marker_head = Marker(self._icon_dir/'head.png',pos)
+        group.add(self._marker_head)
 
         self._marker_tail = Marker(self._icon_dir/'tail.png',pos)
         group.add(self._marker_tail)
@@ -195,7 +199,8 @@ class Viewer(Process):
         marker_type : str
             Type of the marker. Available options are:
                 'nose'
-                'ear'
+                # 'ear' - deleted
+                'head'
                 'food'
                 'tail'
                 'water'
@@ -203,8 +208,9 @@ class Viewer(Process):
             - Tuple for single position
                 'nose'
                 'tail'
+                'head'
             - List of tuples for multiple positions
-                'ear'
+                # 'ear' - deleted
                 'food'
         """
         if 'nose' in marker_type:
@@ -216,10 +222,13 @@ class Viewer(Process):
         elif 'water' in marker_type:
             self._marker_water.change_pos(pos)
         
-        elif 'ear' in marker_type:
-            assert (len(pos) == 2) and isinstance(pos[0],(tuple,list))
-            for m,p in zip(self._marker_ears, pos):
-                m.change_pos(p)
+        # elif 'ear' in marker_type:
+        #     assert (len(pos) == 2) and isinstance(pos[0],(tuple,list))
+        #     for m,p in zip(self._marker_ears, pos):
+        #         m.change_pos(p)
+
+        elif 'head' in marker_type:
+            self._marker_head.change_pos(pos)
 
         elif 'food' in marker_type:
             if len(pos)>0:

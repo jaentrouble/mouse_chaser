@@ -43,13 +43,13 @@ class Engine(Process):
         self._dummy_datum = {
             'image' : np.zeros((300,300,3),dtype=np.uint8),
             'nose' : (0,0),
-            'ear' : [(0,0),(0,0)],
+            'head' : (0,0),
             'tail' : (0,0),
             'food' : [(0,0),(0,0)],
             'water' : (0,0),
         }
         self._multiple_marker_idx = {
-            'ear' : 0,
+            # 'ear' : 0,
             'food' : 0,
         }
 
@@ -165,7 +165,8 @@ class Engine(Process):
         marker_type : str
             Type of the marker. Available options are:
                 'nose'
-                'ear'
+                # 'ear' - deleted
+                'head'
                 'food'
                 'tail'
                 'water'
@@ -177,9 +178,10 @@ class Engine(Process):
             'nose',
             'tail',
             'water',
+            'head' ,
         ]
         multiple_markers = [
-            'ear',
+            # 'ear',
             'food',
         ]
         if marker_type in single_markers:
@@ -261,7 +263,8 @@ class Engine(Process):
                     elif k == K_F:
                         self.update_marker_pos('food',v)
                     elif k == K_E:
-                        self.update_marker_pos('ear',v)
+                        # self.update_marker_pos('ear',v)
+                        self.update_marker_pos('head',v)
                     elif k == K_R:
                         self.update_marker_pos('nose',v)
                     elif k == K_D:
