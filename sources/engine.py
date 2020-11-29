@@ -47,6 +47,7 @@ class Engine(Process):
             'tail' : (0,0),
             'food' : [(0,0),(0,0)],
             'water' : (0,0),
+            'block' : (0,0),
         }
         self._multiple_marker_idx = {
             # 'ear' : 0,
@@ -100,7 +101,7 @@ class Engine(Process):
 
     def next_frame(self):
         last_idx = self.frame_idx
-        self.frame_idx = min(self.frame_idx+1,self.frame_num)
+        self.frame_idx = min(self.frame_idx+1,self.frame_num-1)
         if self.frame_idx+1 > len(self._data):
             new_datum = copy.deepcopy(self._data[last_idx])
             new_datum['image'] = self.image
@@ -170,6 +171,7 @@ class Engine(Process):
                 'food'
                 'tail'
                 'water'
+                'block'
         pos : tuple
             Position of the marker
         """
@@ -179,6 +181,7 @@ class Engine(Process):
             'tail',
             'water',
             'head' ,
+            'block',
         ]
         multiple_markers = [
             # 'ear',
@@ -271,6 +274,8 @@ class Engine(Process):
                         self.update_marker_pos('tail',v)
                     elif k == K_W:
                         self.update_marker_pos('water',v)
+                    elif k == K_Q:
+                        self.update_marker_pos('block',v)
 
                     elif k == K_I:
                         self.add_food_marker(v)

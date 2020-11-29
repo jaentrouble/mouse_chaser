@@ -100,6 +100,8 @@ class Viewer(Process):
                         self._event_queue.put({K_F:pygame.mouse.get_pos()})
                     elif event.key == pygame.K_w:
                         self._event_queue.put({K_W:pygame.mouse.get_pos()})
+                    elif event.key == pygame.K_q:
+                        self._event_queue.put({K_Q:pygame.mouse.get_pos()})
 
                     elif event.key == pygame.K_i:
                         self._event_queue.put({K_I:pygame.mouse.get_pos()})
@@ -156,6 +158,7 @@ class Viewer(Process):
             # 2 Ear markers - deleted
             1 Head marker
             1 Tail marker
+            1 Block marker
             2 Food markers
                 - Note: Food markers will be saved in a list, so that it can
                         handle dynamic numbers of food
@@ -181,6 +184,9 @@ class Viewer(Process):
         self._marker_tail = Marker(self._icon_dir/'tail.png',pos)
         group.add(self._marker_tail)
 
+        self._marker_block = Marker(self._icon_dir/'block.png',pos)
+        group.add(self._marker_block)
+
         self._marker_foods = [
             Marker(self._icon_dir/'food.png', pos),
             Marker(self._icon_dir/'food.png', pos),
@@ -204,11 +210,14 @@ class Viewer(Process):
                 'food'
                 'tail'
                 'water'
+                'block'
         pos : tuple or list of tuples
             - Tuple for single position
                 'nose'
                 'tail'
                 'head'
+                'water'
+                'block'
             - List of tuples for multiple positions
                 # 'ear' - deleted
                 'food'
@@ -229,6 +238,9 @@ class Viewer(Process):
 
         elif 'head' in marker_type:
             self._marker_head.change_pos(pos)
+        
+        elif 'block' in marker_type:
+            self._marker_block.change_pos(pos)
 
         elif 'food' in marker_type:
             if len(pos)>0:

@@ -36,12 +36,13 @@ K_D = 1100
 K_R = 1114
 K_E = 1101
 K_W = 1119
+K_Q = 1113
 
 K_I = 1105
 K_L = 1108
 
 # Console Constants ###########################################################
-VIDEO_FORMATS = ('.h264','.mpg')
+VIDEO_FORMATS = ('.h264','.mpg','mp4')
 
 MESSAGE_BOX = 601
 FRAMEIDX = 602

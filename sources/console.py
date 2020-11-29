@@ -30,6 +30,8 @@ class Console(Process):
             'E : pin head\n'
             'R : pin nose\n'
             'D : pin tail\n'
+            'Q : pin block\n'
+            'W : pin water\n'
             'I : increase food pin\n'
             'L : decrease food pin\n'
         )
