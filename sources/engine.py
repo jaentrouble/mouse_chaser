@@ -42,16 +42,16 @@ class Engine(Process):
         self._data = []
         self._dummy_datum = {
             'image' : np.zeros((300,300,3),dtype=np.uint8),
-            'nose' : (0,0),
+            # 'nose' : (0,0),
             'head' : (0,0),
-            'tail' : (0,0),
-            'food' : [(0,0),(0,0)],
-            'water' : (0,0),
-            'block' : (0,0),
+            # 'tail' : (0,0),
+            # 'food' : [(0,0),(0,0)],
+            # 'water' : (0,0),
+            # 'block' : (0,0),
         }
         self._multiple_marker_idx = {
             # 'ear' : 0,
-            'food' : 0,
+            # 'food' : 0,
         }
 
     @property
@@ -165,27 +165,27 @@ class Engine(Process):
         ----------
         marker_type : str
             Type of the marker. Available options are:
-                'nose'
+                # 'nose'
                 # 'ear' - deleted
                 'head'
-                'food'
-                'tail'
-                'water'
-                'block'
+                # 'food'
+                # 'tail'
+                # 'water'
+                # 'block'
         pos : tuple
             Position of the marker
         """
         datum = self._data[self.frame_idx]
         single_markers = [
-            'nose',
-            'tail',
-            'water',
+            # 'nose',
+            # 'tail',
+            # 'water',
             'head' ,
-            'block',
+            # 'block',
         ]
         multiple_markers = [
             # 'ear',
-            'food',
+            # 'food',
         ]
         if marker_type in single_markers:
             datum[marker_type] = pos

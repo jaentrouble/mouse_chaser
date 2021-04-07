@@ -154,12 +154,12 @@ class Viewer(Process):
         """Initiate all markers
 
         Markers initiating here : 
-            1 Nose marker
+            # 1 Nose marker
             # 2 Ear markers - deleted
             1 Head marker
-            1 Tail marker
-            1 Block marker
-            2 Food markers
+            # 1 Tail marker
+            # 1 Block marker
+            # 2 Food markers
                 - Note: Food markers will be saved in a list, so that it can
                         handle dynamic numbers of food
         Argument
@@ -168,8 +168,8 @@ class Viewer(Process):
             group that all markers should add into.
         """
         pos = (0,0)
-        self._marker_nose = Marker(self._icon_dir/'nose.png',pos)
-        group.add(self._marker_nose)
+        # self._marker_nose = Marker(self._icon_dir/'nose.png',pos)
+        # group.add(self._marker_nose)
 
         # self._marker_ears = [
         #     Marker(self._icon_dir/'ear.png',pos),
@@ -181,21 +181,21 @@ class Viewer(Process):
         self._marker_head = Marker(self._icon_dir/'head.png',pos)
         group.add(self._marker_head)
 
-        self._marker_tail = Marker(self._icon_dir/'tail.png',pos)
-        group.add(self._marker_tail)
+        # self._marker_tail = Marker(self._icon_dir/'tail.png',pos)
+        # group.add(self._marker_tail)
 
-        self._marker_block = Marker(self._icon_dir/'block.png',pos)
-        group.add(self._marker_block)
+        # self._marker_block = Marker(self._icon_dir/'block.png',pos)
+        # group.add(self._marker_block)
 
-        self._marker_foods = [
-            Marker(self._icon_dir/'food.png', pos),
-            Marker(self._icon_dir/'food.png', pos),
-        ]
-        for m in self._marker_foods:
-            group.add(m)
+        # self._marker_foods = [
+        #     Marker(self._icon_dir/'food.png', pos),
+        #     Marker(self._icon_dir/'food.png', pos),
+        # ]
+        # for m in self._marker_foods:
+        #     group.add(m)
 
-        self._marker_water = Marker(self._icon_dir/'water.png',pos)
-        group.add(self._marker_water)
+        # self._marker_water = Marker(self._icon_dir/'water.png',pos)
+        # group.add(self._marker_water)
 
     def update_marker_pos(self, marker_type, pos):
         """Update marker's position.
@@ -204,13 +204,13 @@ class Viewer(Process):
         ----------
         marker_type : str
             Type of the marker. Available options are:
-                'nose'
+                # 'nose'
                 # 'ear' - deleted
                 'head'
-                'food'
-                'tail'
-                'water'
-                'block'
+                # 'food'
+                # 'tail'
+                # 'water'
+                # 'block'
         pos : tuple or list of tuples
             - Tuple for single position
                 'nose'
@@ -222,45 +222,45 @@ class Viewer(Process):
                 # 'ear' - deleted
                 'food'
         """
-        if 'nose' in marker_type:
-            self._marker_nose.change_pos(pos)
+        # if 'nose' in marker_type:
+        #     self._marker_nose.change_pos(pos)
 
-        elif 'tail' in marker_type:
-            self._marker_tail.change_pos(pos)
+        # elif 'tail' in marker_type:
+        #     self._marker_tail.change_pos(pos)
 
-        elif 'water' in marker_type:
-            self._marker_water.change_pos(pos)
+        # elif 'water' in marker_type:
+        #     self._marker_water.change_pos(pos)
         
         # elif 'ear' in marker_type:
         #     assert (len(pos) == 2) and isinstance(pos[0],(tuple,list))
         #     for m,p in zip(self._marker_ears, pos):
         #         m.change_pos(p)
 
-        elif 'head' in marker_type:
+        if 'head' in marker_type:
             self._marker_head.change_pos(pos)
         
-        elif 'block' in marker_type:
-            self._marker_block.change_pos(pos)
+        # elif 'block' in marker_type:
+        #     self._marker_block.change_pos(pos)
 
-        elif 'food' in marker_type:
-            if len(pos)>0:
-                assert isinstance(pos[0],(tuple,list))
-            num_diff = len(self._marker_foods) - len(pos)
-            if num_diff == 0:
-                for m,p in zip(self._marker_foods, pos):
-                    m.change_pos(p)
-            elif num_diff > 0:
-                for _ in range(num_diff):
-                    m = self._marker_foods.pop()
-                    m.kill()
-                    del m
-                for m,p in zip(self._marker_foods, pos):
-                    m.change_pos(p)
-            elif num_diff < 0:
-                for m, p in zip(self._marker_foods, pos[:num_diff]):
-                    m.change_pos(p)
-                for p in pos[num_diff:]:
-                    self._add_food_marker(self._allgroup,p)
+        # elif 'food' in marker_type:
+        #     if len(pos)>0:
+        #         assert isinstance(pos[0],(tuple,list))
+        #     num_diff = len(self._marker_foods) - len(pos)
+        #     if num_diff == 0:
+        #         for m,p in zip(self._marker_foods, pos):
+        #             m.change_pos(p)
+        #     elif num_diff > 0:
+        #         for _ in range(num_diff):
+        #             m = self._marker_foods.pop()
+        #             m.kill()
+        #             del m
+        #         for m,p in zip(self._marker_foods, pos):
+        #             m.change_pos(p)
+        #     elif num_diff < 0:
+        #         for m, p in zip(self._marker_foods, pos[:num_diff]):
+        #             m.change_pos(p)
+        #         for p in pos[num_diff:]:
+        #             self._add_food_marker(self._allgroup,p)
     def close(self):
         pygame.quit()
 
