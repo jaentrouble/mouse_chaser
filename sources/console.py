@@ -124,6 +124,7 @@ class Console(Process):
             for f in os.listdir(self._vid_folder):
                 if f.endswith(VIDEO_FORMATS):
                     self._vid_name_list.append(f)
+            self._vid_name_list.sort()
             if len(self._vid_name_list) > 0 :
                 self._to_EngineQ.put({
                     NEWVID:os.path.join(self._vid_folder,
