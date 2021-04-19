@@ -11,7 +11,7 @@ n_split = args.frames
 
 cap = cv2.VideoCapture(vid_path)
 n = 0
-fourcc = cv2.VideoWriter_fourcc(*'MP4V')
+fourcc = cv2.VideoWriter_fourcc(*'mp4v')
 initialized = False
 while cap.isOpened():
     ret, frame = cap.read()
